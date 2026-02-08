@@ -131,21 +131,25 @@
 % \end{file}
 
 \mdfdefinestyle{file}{
-	innertopmargin=1.6\baselineskip,
-	innerbottommargin=0.8\baselineskip,
-	topline=false, bottomline=false,
-	leftline=false, rightline=false,
-	leftmargin=1cm,
-	rightmargin=1cm,
-	singleextra={%
+	innertopmargin=1.6em,
+	topline=true, bottomline=true,
+	leftline=true, rightline=true,
+	leftmargin=0.5cm,
+	rightmargin=0.5cm,
+	linewidth=0.5pt,
+	linecolor=black,
+	singleextra ={
 		\draw[fill=black!10!white](P)++(0,-1.2em)rectangle(P-|O);
 		\node[anchor=north west]
 		at(P-|O){\ttfamily\mdfilename};
-		\def\l{3em}
-		\draw(O-|P)++(-\l,0)--++(\l,\l)--(P)--(P-|O)--(O)--cycle;
-		\draw(O-|P)++(-\l,0)--++(0,\l)--++(\l,0);
 	},
-	nobreak,
+	firstextra={
+		\draw[fill=black!10!white](P)++(0,-1.2em)rectangle(P-|O);
+		\node[anchor=north west]
+		at(P-|O){\ttfamily\mdfilename};
+	},
+	middleextra={},
+	secondextra={},
 }
 
 % Define a custom environment for file contents
@@ -153,8 +157,8 @@
 	\medskip
 	\newcommand{\mdfilename}{#1}
 	\begin{mdframed}[style=file]
-	\small
-	\setstretch{1}
+	\footnotesize
+	\setstretch{0.9}
 }{
 	\normalsize
 	\end{mdframed}

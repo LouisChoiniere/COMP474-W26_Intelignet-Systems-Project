@@ -71,8 +71,41 @@ The factbase \textit{F} consists of a comprehensive collection of hardware speci
 
 Here are the facts included in the factbase:
 
-\begin{file}[factbase.clp]
-\lstinputlisting{factbase.clp.temp}
+\begin{file}[rulebase.clp (partial)]
+\begin{lstlisting}
+(deftemplate os-fact
+	(slot name)
+	(slot min-ram-gb)
+	(slot recommended-ram-gb)
+	(slot min-disk-gb)
+	(slot recommended-disk-gb)
+    (slot gpu-graphis-api))
+
+(deffacts operating-system-facts
+	(os-fact
+		(name linux)
+		(min-ram-gb 2)
+		(recommended-ram-gb 4)
+		(min-disk-gb 25)
+		(recommended-disk-gb 50))
+
+	(os-fact
+		(name windows-10)
+		(min-ram-gb 2)
+		(recommended-ram-gb 8)
+		(min-disk-gb 20)
+		(recommended-disk-gb 64)
+        (gpu-graphis-api directx-9))
+
+	(os-fact
+		(name windows-11)
+		(min-ram-gb 4)
+		(recommended-ram-gb 8)
+		(min-disk-gb 64)
+		(recommended-disk-gb 128)
+        (gpu-graphis-api directx-12))
+    )
+\end{lstlisting}
 \end{file}
 
 % ---------------------------------------------------------------------------------------
@@ -83,8 +116,21 @@ Here are the facts included in the factbase:
 
 The rulebase \textit{R} contains the logic for synthesizing hardware specifications based on the software requirements provided by the user. It includes rules for determining the necessary CPU performance, GPU capabilities, RAM capacity, and storage requirements based on the software's minimum and recommended specifications.
 
+Rules in the rulebase might include:
+
+\begin{file}[hello.py]
+\begin{lstlisting}[language=Python]
+#! /usr/bin/python
+
+import sys
+sys.stdout.write("Hello World!\n")
+\end{lstlisting}
+\end{file}
+
 \begin{file}[rulebase.clp]
-\lstinputlisting{rulebase.clp.temp}
+\begin{lstlisting}
+**** TODO ****
+\end{lstlisting}
 \end{file}
 
 % ---------------------------------------------------------------------------------------
@@ -94,7 +140,7 @@ The rulebase \textit{R} contains the logic for synthesizing hardware specificati
 \textbf{\textit{K}:} \texttt{Hardware Specification Generation Algorithm}
 
 \begin{file}[rulebase.clp]
-\lstinputlisting{rulebase.clp.temp}
+\lstinputlisting{../Clips/rulebase.clp}
 \end{file}
 
 % ---------------------------------------------------------------------------------------
