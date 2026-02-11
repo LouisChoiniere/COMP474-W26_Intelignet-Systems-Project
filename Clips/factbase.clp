@@ -6,10 +6,13 @@
 	(slot rec-disk-gb)
     (slot gpu-graphics-api))
 
+(deftemplate software-type-facts
+	(slot type))
+
 (deftemplate software-facts
 	(slot name)
 	(slot type)
-	(slot os-compatibility)
+	(multislot os-compatibility)
 	(slot min-ram-gb)
 	(slot rec-ram-gb)
 	(slot storage-gb))
@@ -42,6 +45,13 @@
 		(rec-disk-gb 256)
         (gpu-graphics-api directx-12))
     )
+
+(deffacts software-type-facts
+	(software-type-facts (type development))
+	(software-type-facts (type game))
+	(software-type-facts (type application))
+	(software-type-facts (type graphics))
+)
 
 (deffacts software-facts
 	; source: https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements
@@ -115,7 +125,7 @@
 		(os-compatibility windows-10 windows-11 linux)
 		(min-ram-gb 8)
 		(rec-ram-gb 32)
-		(storage-gb 2)
+		(storage-gb 2))
 
 	; source: https://dev.epicgames.com/documentation/en-us/unreal-engine/hardware-and-software-specifications-for-unreal-engine
 	; source: https://thetechylife.com/how-many-gb-is-unreal/

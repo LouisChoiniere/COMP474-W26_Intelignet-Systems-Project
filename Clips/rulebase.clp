@@ -32,10 +32,52 @@
 ; Remove facts about other OSes that are not selected
 (defrule remove-unselected-os-facts
     (using-os ?os-name)
-    ?other-os <- (os-facts (name ?other&~?os-name))
+    ?other-os-fact <- (os-facts (name ?other&~?os-name))
     =>
-    (retract ?other-os)
+    (retract ?other-os-fact)
 )
+
+; Remove facts about other software that are not compatible with the selected OS
+(defrule remove-incompatible-software-facts
+    (using-os ?os-name)
+    ?software-facts <- (software-facts
+        (os-compatibility $?compatible-os))
+    (test (not (member$ ?os-name ?compatible-os)))
+    =>
+    (retract ?software-facts)
+)
+
+; ===============================================
+; Rules for software types requirements
+; ===============================================
+
+(defrule software-type-requirements
+    (using-software-type ?using-software-type-name)
+    ?software-type <- (software-type-facts (type ?using-software-type-name))
+    =>
+    ; No specific requirements for software types in this implementation, but we could add some if needed.
+    (retract ?software-type)
+)
+
+; Remove software type facts once software types have been selected
+(defrule remove-unselected-software-type-facts 
+    (using-software-type ?using-software-type-name)
+    ?software-type-fact <- (software-type-facts (type ?other&~?using-software-type-name))
+    =>
+    (retract ?software-type-fact)
+)
+
+; Remove software facts that don't match ANY of the selected software types
+; NOT WORKING removes all other software.
+; (defrule remove-software-facts-not-matching-selected-types
+;     (not (and (using-software-type ?t1)
+;               (using-software-type ?t2&~?t1)))
+;     ?software-fact <- (software-facts (type ?software-type))
+;     (not (using-software-type ?software-type))
+;     =>
+;     (retract ?software-fact)
+; )
+
 
 ; ===============================================
 ; Rules for software requirements
@@ -63,7 +105,7 @@
 )
 
 ; When a software is selected, update the cumulative RAM and disk requirements
-(defrule add-software-requirements
+(defrule software-requirements
     ?using-software <- (using-software ?software-name)
     ?software-facts <- (software-facts
         (name ?software-name)
@@ -76,9 +118,6 @@
         (min-ram-gb ?current-min-ram)
         (rec-ram-gb ?current-rec-ram))
     =>
-    ; Remove the using-software fact since we've processed it
-    (retract ?using-software)
-
     ; Update cumulative storage requirement
     (retract ?current-storage)
     (assert (software-disk-requirements-cumulative
@@ -90,30 +129,9 @@
         (min-ram-gb (max ?current-min-ram ?min-ram))
         (rec-ram-gb (max ?current-rec-ram ?rec-ram))))
 
-    ; Remove facts about selected software
+    ; Retract the software fact and using-software fact since it's been processed.
+    (retract ?using-software)
     (retract ?software-facts)
-)
-
-; ===============================================
-; Remove facts about unselected software type
-; ===============================================
-
-; When a software type is deselected, remove all facts about software of that type
-(defrule remove-unselected-software-type-facts-1
-    (not-using-software-type ?type)
-    ?software-facts <- (software-facts
-        (type ?type))
-    =>
-    (retract ?software-facts)
-)
-
-; If no software of that type remains, remove the not-using fact as well
-(defrule remove-unselected-software-type-facts-2
-    ?not-using <- (not-using-software-type ?type)
-    (not (software-facts
-        (type ?type)))
-    =>
-    (retract ?not-using)
 )
 
 ; ===============================================
@@ -128,7 +146,7 @@
 
 
 ; ===============================================
-; Calculate and print total requirements
+; Calculate requirements
 ; ===============================================
 
 (deftemplate total-requirements
@@ -157,18 +175,4 @@
         (rec-ram-gb (+ ?os-rec-ram ?sw-rec-ram))
         (min-disk-gb (+ ?os-min-disk ?sw-storage))
         (rec-disk-gb (+ ?os-rec-disk ?sw-storage))))
-)
-
-(defrule print-total-requirements
-    ?total <- (total-requirements
-        (min-ram-gb ?min-ram)
-        (rec-ram-gb ?rec-ram)
-        (min-disk-gb ?min-disk)
-        (rec-disk-gb ?rec-disk))
-    =>
-    (printout t "Total Minimum RAM Required: " ?min-ram " GB (nearest available size " (ram-rounded ?min-ram) " GB)" crlf)
-    (printout t "Total Recommended RAM Required: " ?rec-ram " GB (nearest available size " (ram-rounded ?rec-ram) " GB)" crlf)
-    (printout t "Total Minimum Disk Space Required: " ?min-disk " GB (nearest available size " (disk-rounded ?min-disk) " GB)" crlf)
-    (printout t "Total Recommended Disk Space Required: " ?rec-disk " GB (nearest available size " (disk-rounded ?rec-disk) " GB)" crlf)
-    (retract ?total)
 )
