@@ -12,6 +12,7 @@
 
 ; When an OS is selected, assert its RAM and disk requirements as separate facts
 (defrule os-requirements
+    (declare (salience 3))
     (using-os ?os-name)
     ?os-fact <- (os-facts
         (name ?os-name)
@@ -31,6 +32,7 @@
 
 ; Remove facts about other OSes that are not selected
 (defrule remove-unselected-os-facts
+    (declare (salience 10))
     (using-os ?os-name)
     ?other-os-fact <- (os-facts (name ?other&~?os-name))
     =>
@@ -39,6 +41,7 @@
 
 ; Remove facts about other software that are not compatible with the selected OS
 (defrule remove-incompatible-software-facts
+    (declare (salience 5))
     (using-os ?os-name)
     ?software-facts <- (software-facts
         (os-compatibility $?compatible-os))
@@ -52,6 +55,7 @@
 ; ===============================================
 
 (defrule software-type-requirements
+    (declare (salience 3))
     (using-software-type ?using-software-type-name)
     ?software-type <- (software-type-facts (type ?using-software-type-name))
     =>
@@ -60,24 +64,25 @@
 )
 
 ; Remove software type facts once software types have been selected
-(defrule remove-unselected-software-type-facts 
-    (using-software-type ?using-software-type-name)
-    ?software-type-fact <- (software-type-facts (type ?other&~?using-software-type-name))
+(defrule remove-unselected-software-type-facts
+    (declare (salience 10))
+    (exists (using-software-type ?any-selected-type))
+
+    ?software-type-fact <- (software-type-facts (type ?software-type-name))
+    (not (using-software-type ?software-type-name))
     =>
     (retract ?software-type-fact)
 )
 
-; Remove software facts that don't match ANY of the selected software types
-; NOT WORKING removes all other software.
-; (defrule remove-software-facts-not-matching-selected-types
-;     (not (and (using-software-type ?t1)
-;               (using-software-type ?t2&~?t1)))
-;     ?software-fact <- (software-facts (type ?software-type))
-;     (not (using-software-type ?software-type))
-;     =>
-;     (retract ?software-fact)
-; )
+(defrule remove-software-facts-not-matching-selected-types
+    (declare (salience 5))
+   (exists (using-software-type ?any-selected-type))
 
+   ?software-fact <- (software-facts (type ?software-type))
+   (not (using-software-type ?software-type))
+   =>
+   (retract ?software-fact)
+)
 
 ; ===============================================
 ; Rules for software requirements
@@ -139,7 +144,9 @@
 ; ===============================================
 
 (defrule check-done
-    (not (software-facts))
+    (declare (salience -10))
+    ; (not (software-facts))
+    (not (using-software-type))
     =>
     (assert (done))
 )

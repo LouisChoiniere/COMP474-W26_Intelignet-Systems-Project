@@ -10,7 +10,7 @@
 
 (defrule ask-for-os
     =>
-    (printout t "Available Operating Systems:" crlf)
+    (printout t crlf "Available Operating Systems:" crlf)
 
     (do-for-all-facts ((?os os-facts)) TRUE
         (printout t "- " ?os:name crlf))
@@ -28,7 +28,7 @@
 (defrule ask-for-software-type
     (using-os ?os-name)
     =>
-    (printout t "Available Software Types:" crlf)
+    (printout t crlf "Available Software Types:" crlf)
     
     (do-for-all-facts ((?st software-type-facts)) TRUE
         (printout t "- " ?st:type crlf))
@@ -53,7 +53,7 @@
 (defrule ask-for-software
     ?st <- (using-software-type ?type)
     =>
-    (printout t "Available Software in " ?type " category:" crlf)
+    (printout t crlf "Available Software in " ?type " category:" crlf)
     
     (do-for-all-facts ((?sw software-facts)) (eq ?sw:type ?type)
     (printout t "- " ?sw:name crlf))
@@ -80,6 +80,7 @@
         (min-disk-gb ?min-disk)
         (rec-disk-gb ?rec-disk))
     =>
+    (printout t crlf "Total Requirements:" crlf)
     (printout t "Total Minimum RAM Required: " ?min-ram " GB (nearest available size " (ram-rounded ?min-ram) " GB)" crlf)
     (printout t "Total Recommended RAM Required: " ?rec-ram " GB (nearest available size " (ram-rounded ?rec-ram) " GB)" crlf)
     (printout t "Total Minimum Disk Space Required: " ?min-disk " GB (nearest available size " (disk-rounded ?min-disk) " GB)" crlf)

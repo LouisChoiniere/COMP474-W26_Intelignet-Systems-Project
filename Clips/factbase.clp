@@ -44,7 +44,7 @@
 		(min-disk-gb 64)
 		(rec-disk-gb 256)
         (gpu-graphics-api directx-12))
-    )
+)
 
 (deffacts software-type-facts
 	(software-type-facts (type development))

@@ -5,10 +5,31 @@
     (if (> ?q ?i) then (+ ?i 1) else ?i)
 )
 
+; Generated using GTP-5.3-Codex withing VSCode on 2026-02-19
+
 ; Function to round RAM requirements up to the nearest standard size
 (deffunction ram-rounded (?storage)
-    (* (ceiling (/ ?storage 2.0)) 2)
+    (bind ?p 1)
+    (while (< ?p ?storage) do
+        (bind ?p (* ?p 2))
+    )
+    (return ?p)
 )
+
+; Test the ram-rounded function
+; (defrule test-ram-rounded
+;     =>
+;     (printout t "Testing ram-rounded function:" crlf)
+;     (printout t "Input: 0.5 GB, Rounded: " (ram-rounded 0.5) " GB" crlf)
+;     (printout t "Input: 1 GB, Rounded: " (ram-rounded 1) " GB" crlf)
+;     (printout t "Input: 1.5 GB, Rounded: " (ram-rounded 1.5) " GB" crlf)
+;     (printout t "Input: 6 GB, Rounded: " (ram-rounded 6) " GB" crlf)
+;     (printout t "Input: 10 GB, Rounded: " (ram-rounded 10) " GB" crlf)
+;     (printout t "Input: 36 GB, Rounded: " (ram-rounded 36) " GB" crlf)
+; )
+
+
+; Generated using GTP-5.2-Codex within VSCode on 2026-02-08
 
 ; Function to round storage requirements up to the nearest standard size
 (deffunction disk-rounded (?storage)
@@ -20,6 +41,18 @@
     else (if (<= ?storage 2000) then 2000
     else (* (ceiling (/ ?storage 1000.0)) 1000)))))))
 )
+
+; Test the disk-rounded function
+; (defrule test-disk-rounded
+;     =>
+;     (printout t "Testing disk-rounded function:" crlf)
+;     (printout t "Input: 0 GB, Rounded: " (disk-rounded 0) " GB" crlf)
+;     (printout t "Input: 31 GB, Rounded: " (disk-rounded 31) " GB" crlf)
+;     (printout t "Input: 56 GB, Rounded: " (disk-rounded 56) " GB" crlf)
+; )
+
+
+; Generated using GTP-5.2-Codex within VSCode on 2026-02-08
 
 ; Function to parse comma-separated input and return a multifield value
 (deffunction parse-comma-separated (?input)

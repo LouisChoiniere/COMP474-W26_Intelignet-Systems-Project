@@ -39,9 +39,9 @@
 
 \usepackage{listings} % File listings, with syntax highlighting
 \lstset{
-	basicstyle=\ttfamily, % Typeset listings in monospace font
-	breaklines=true, % Enable line wrapping in listings
-	% breakatwhitespace=true, % Prefer breaks at whitespace
+    basicstyle=\small\ttfamily, % Code font and size
+    breaklines=true, % Enable line wrapping in listings
+    % breakatwhitespace=true, % Prefer breaks at whitespace
 }
 
 %----------------------------------------------------------------------------------------
@@ -70,6 +70,7 @@
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 
 \usepackage{XCharter} % Use the XCharter fonts
+\usepackage[scaled=0.90]{inconsolata} % Monospace font for code/listings
 
 % Improve wrapping for typewriter text
 \pretocmd{\ttfamily}{\hyphenchar\font=`\-}{}{}

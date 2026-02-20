@@ -4,6 +4,7 @@
 
 \documentclass{article}
 
+\usepackage[hidelinks]{hyperref}
 \input{structure.tex} % Include the file specifying the document structure and custom commands
 
 % ---------------------------------------------------------------------------------------
@@ -34,9 +35,9 @@
 
 \textbf{\textit{D}:} \texttt{Cross-Platform Hardware-Software Requirements Mapping}
 
-The chosen problem domain involves the alignment of hardware capabilities with software demands, specifically addressing the growing complexity of matching hardware capabilities to escalating software demands. Within this, the knowledge domain \textit{D} is defined as the systematic mapping of software system requirements including operating systems, professional applications, and video games a unified, optimized hardware specification. This domain is important because, every developer provides individual "minimum" and "recommended" specs, they are often complicated and difficult to interpret to the average user.
+The chosen problem domain involves the alignment of hardware capabilities with software demands, specifically addressing the growing complexity of matching hardware capabilities to escalating software demands. Within this, the knowledge domain \textit{D} is defined as the mapping of software system requirements including operating systems, professional applications, and video games a unified, optimized hardware specification. This domain is important because, every developer provides individual "minimum" and "recommended" specs, they are often complicated and difficult to interpret to the average user.
 
-My expertise in this domain comes from my background as a Computer Engineering student and my hands-on experience in building and repairing systems. This academic foundation provides the technical understanding of how components like the CPU, GPU, and RAM interact under load, while my personal experience as a gamer gives me "heuristic" knowledge in interpreting and compiling developer-provided specs. Furthermore, the domain is supported by a wealth of authoritative, publicly available data. This includes official hardware standards from manufacturers like Intel and NVIDIA, peer-reviewed performance benchmarks from industry-leading publications, and the standardized system requirements published by software developers.
+My expertise in this domain comes from my background as a Computer Engineering student and my hands-on experience in building and repairing systems. This academic foundation provides the technical understanding of how components like the CPU, GPU, and RAM interact under load, while my personal experience as a gamer gives me "heuristic" knowledge in interpreting and compiling developer-provided specs. Furthermore, the domain is supported by a large quantity of authoritative, publicly available data. This includes official hardware standards from manufacturers like Intel and NVIDIA, performance benchmarks from industry-leading publications, and the system requirements published by software developers.
 
 The experiential knowledge inherent in \textit{D} is valuable to others because it transforms fragmented data into actionable intelligence. Rather than a user manually cross-referencing tens of different sets of requirements, an intelligent system in this domain can synthesize a "composite requirement profile." This allows for more informed decision-making, such as identifying where a user can save money by avoiding unnecessary overhead or where they must invest more to ensure multi-tasking stability. Ultimately, the system serves as a bridge between raw technical specifications and the practical needs of the end-user.
 
@@ -46,8 +47,7 @@ The experiential knowledge inherent in \textit{D} is valuable to others because 
 
 \textbf{\textit{G}:} \texttt{Generate Hardware Specifications from Software Requirements}
 
-***Rewrite*** \\
-The goal of this project is to develop an intelligent system that autonomously synthesizes a single, optimized hardware specification from a user-defined list of software (including the operating system, productivity tools, and games).
+The goal of this project is to develop an intelligent system that synthesizes a unified hardware specification by analyzing a user-defined list of software requirements, including operating systems, productivity applications, and games, to generate optimized and cost-effective recommendations.
 
 % ---------------------------------------------------------------------------------------
 
@@ -67,44 +67,54 @@ The primary user of this system is any individual ranging from casual consumers 
 
 \textbf{\textit{F}:} \texttt{Hardware-Software Requirements Database}
 
-The factbase \textit{F} consists of a comprehensive collection of hardware specifications and software requirements. This includes detailed information on CPU models, GPU capabilities, RAM types and capacities, storage options, and their respective performance benchmarks. Additionally, it encompasses the minimum and recommended system requirements for a wide range of software applications, including operating systems, productivity tools, and video games. The factbase is structured to allow for efficient querying and retrieval of relevant data based on user-defined software lists.
+The factbase \textit{F} consists of a comprehensive collection of hardware specifications and software requirements. This includes information on RAM  requirement and storage size. Additionally, it encompasses the minimum and recommended system requirements for a wide range of software applications, including operating systems, productivity tools, and video games.
 
-Here are the facts included in the factbase:
+Here are some of facts included in the factbase:\\
+\indent\small{\it See appendix for the full factbase.}
 
-\begin{file}[rulebase.clp (partial)]
+\begin{file}[factbase.clp (partial)]
 \begin{lstlisting}
-(deftemplate os-fact
+(deftemplate os-facts
 	(slot name)
 	(slot min-ram-gb)
-	(slot recommended-ram-gb)
+	(slot rec-ram-gb)
 	(slot min-disk-gb)
-	(slot recommended-disk-gb)
-    (slot gpu-graphis-api))
+	(slot rec-disk-gb)
+    (slot gpu-graphics-api))
+
+[...]
 
 (deffacts operating-system-facts
-	(os-fact
+	; source: https://linuxvox.com/blog/linux-ubuntu-minimum-requirements/
+	(os-facts
 		(name linux)
 		(min-ram-gb 2)
-		(recommended-ram-gb 4)
+		(rec-ram-gb 4)
 		(min-disk-gb 25)
-		(recommended-disk-gb 50))
+		(rec-disk-gb 50))
 
-	(os-fact
+	; source: https://support.microsoft.com/en-us/windows/windows-10-system-requirements-6d4e9a79-66bf-7950-467c-795cf0386715
+	(os-facts
 		(name windows-10)
 		(min-ram-gb 2)
-		(recommended-ram-gb 8)
+		(rec-ram-gb 8)
 		(min-disk-gb 20)
-		(recommended-disk-gb 64)
-        (gpu-graphis-api directx-9))
+		(rec-disk-gb 64)
+        (gpu-graphics-api directx-9))
 
-	(os-fact
-		(name windows-11)
+[...]
+
+(deffacts software-facts
+	; source: https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements
+	(software-facts
+		(name visual-studio)
+		(type development)
+		(os-compatibility windows-10 windows-11)
 		(min-ram-gb 4)
-		(recommended-ram-gb 8)
-		(min-disk-gb 64)
-		(recommended-disk-gb 128)
-        (gpu-graphis-api directx-12))
-    )
+		(rec-ram-gb 16)
+		(storage-gb 20))
+
+[...]
 \end{lstlisting}
 \end{file}
 
@@ -112,35 +122,137 @@ Here are the facts included in the factbase:
 
 \subsection{Rulebase (R)}
 
-\textbf{\textit{R}:} \texttt{Hardware Specification Synthesis Rules}
+% \textbf{\textit{R}:} \texttt{Hardware Specification Synthesis Rules}
 
-The rulebase \textit{R} contains the logic for synthesizing hardware specifications based on the software requirements provided by the user. It includes rules for determining the necessary CPU performance, GPU capabilities, RAM capacity, and storage requirements based on the software's minimum and recommended specifications.
+The rulebase \textit{R} contains the logic for synthesizing hardware specifications based on the software requirements provided by the user. It includes rules for determining the operating system the user intends to use, the types of applications and the applications they intend to use. Any not supported or not used applications are automatically pruned from the list available to the user. Finaly the rulebase includes rules to determine the minimum and recommended hardware specifications based on the software requirements.
 
-Rules in the rulebase might include:
 
-\begin{file}[hello.py]
-\begin{lstlisting}[language=Python]
-#! /usr/bin/python
+Rules in the rulebase might include:\\
+\indent\small{\it See appendix for the full rulebase.}
 
-import sys
-sys.stdout.write("Hello World!\n")
+\begin{file}[rulebase.clp (partial)]
+\begin{lstlisting}
+[...]
+
+; When an OS is selected, assert its RAM and disk requirements
+(defrule os-requirements
+    (using-os ?os-name)
+    ?os-fact <- (os-facts
+        (name ?os-name)
+        (min-ram-gb ?os-min-ram)
+        (rec-ram-gb ?os-rec-ram)
+        (min-disk-gb ?os-min-disk)
+        (rec-disk-gb ?os-rec-disk))
+    =>
+    (assert (os-ram-requirements
+        (min-ram-gb ?os-min-ram)
+        (rec-ram-gb ?os-rec-ram)))
+    (assert (os-disk-requirements
+        (min-disk-gb ?os-min-disk)
+        (rec-disk-gb ?os-rec-disk)))
+    (retract ?os-fact)
+)
+
+[...]
 \end{lstlisting}
 \end{file}
 
-\begin{file}[rulebase.clp]
+
+\begin{file}[rulebase.clp (partial)]
 \begin{lstlisting}
-**** TODO ****
+[...]
+
+; When a software is selected, update the cumulative RAM and disk requirements
+(defrule software-requirements
+    ?using-software <- (using-software ?software-name)
+    ?software-facts <- (software-facts
+        (name ?software-name)
+        (min-ram-gb ?min-ram)
+        (rec-ram-gb ?rec-ram)
+        (storage-gb ?storage-gb))
+    ?current-storage <- (software-disk-requirements-cumulative
+        (total-storage-gb ?current-total))
+    ?current-ram <- (software-ram-requirements-min
+        (min-ram-gb ?current-min-ram)
+        (rec-ram-gb ?current-rec-ram))
+    =>
+    ; Update cumulative storage requirement
+    (retract ?current-storage)
+    (assert (software-disk-requirements-cumulative
+        (total-storage-gb (+ ?current-total ?storage-gb))))
+
+    ; Update cumulative RAM requirement by taking the max of current and new requirements
+    (retract ?current-ram)
+    (assert (software-ram-requirements-min
+        (min-ram-gb (max ?current-min-ram ?min-ram))
+        (rec-ram-gb (max ?current-rec-ram ?rec-ram))))
+
+    ; Retract the software fact and using-software fact since it's been processed.
+    (retract ?using-software)
+    (retract ?software-facts)
+)
+
+[...]
+\end{lstlisting}
+\end{file}
+
+\begin{file}[rulebase.clp (partial)]
+\begin{lstlisting}
+[...]
+
+; ===============================================
+; List available os to user and ask for selection
+; ===============================================
+
+(defrule ask-for-os
+    =>
+    (printout t "Available Operating Systems:" crlf)
+
+    (do-for-all-facts ((?os os-facts)) TRUE
+        (printout t "- " ?os:name crlf))
+    
+    (printout t "Please enter the name of the operating system you want to use: ")
+    
+    (bind ?selected-os (read))
+    (assert (using-os ?selected-os))
+)
+
+[...]
 \end{lstlisting}
 \end{file}
 
 % ---------------------------------------------------------------------------------------
 
-\subsection{Combination (K)}
+\pagebreak
+\section{Appendix}
 
-\textbf{\textit{K}:} \texttt{Hardware Specification Generation Algorithm}
+\textbf{Source Code Repository}\\
+The complete source code for this project is available on GitHub:
+
+\url{https://github.com/LouisChoiniere/COMP474-W26\_Intelignet-Systems-Project}
+
+\begin{file}[factbase.clp]
+\lstinputlisting{../Clips/factbase.clp}
+\end{file}
 
 \begin{file}[rulebase.clp]
 \lstinputlisting{../Clips/rulebase.clp}
+\end{file}
+
+\begin{file}[function.clp]
+\lstinputlisting{../Clips/function.clp}
+\end{file}
+
+\begin{file}[hardware\_spec\_synthesizer.clp]
+\lstinputlisting{../Clips/hardware_spec_synthesizer.clp}
+\end{file}
+
+\begin{file}[reset.clp]
+\lstinputlisting{../Clips/reset.clp}
+\end{file}
+
+\begin{file}[reset2.clp]
+\lstinputlisting{../Clips/reset2.clp}
 \end{file}
 
 % ---------------------------------------------------------------------------------------
