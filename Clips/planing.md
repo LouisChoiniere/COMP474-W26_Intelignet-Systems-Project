@@ -2,6 +2,8 @@
 
 **TL;DR:** Expand GPU modeling and software database (Phase 2A), then independently implement three uncertainty frameworks: Certainty Factors (2B) and Dempster-Shafer (2C) for probabilistic reasoning, and Fuzzy Logic (2D) for possibilistic reasoning. Each uncertainty framework adds 5+ facts and 10+ rules as required.
 
+*Note: Reference FuzzyCLIPS610d.pdf for syntax and fuzzy logic*
+
 ---
 
 ## Steps
@@ -20,7 +22,7 @@
    - Ensure all entries have complete os-compatibility and resource specs
 
 3. **Introduce Uncertainty Foundation Facts** (depends on step 2)
-   - Create `software-compatibility-confidence` template in factbase.clp
+   - Create `software-compatibility-confidence` template in new file (separate uncertainty knowledge logic)
    - Add 5–10 base uncertainty facts for cross-platform software (e.g., IntelliJ on Linux: 0.95 confidence; VS on Linux: 0.15)
 
 ---
@@ -88,22 +90,6 @@
 
 ---
 
-## Relevant Files
-
-**Modified:**
-- factbase.clp — GPU VRAM/API fields; 15+ new software; CF/D-S/Fuzzy base facts
-- rulebase.clp — GPU validation rules
-- function.clp — CF combination, D-S combination, fuzzification/de-fuzzification functions
-- hardware_spec_synthesizer.clp — GPU selection prompts; uncertainty model choice UI
-- reset.clp / reset2.clp — Conditionally load uncertainty frameworks
-
-**New:**
-- `cf-uncertainty.clp` — Certainty Factors framework
-- `ds-uncertainty.clp` — Dempster-Shafer framework
-- `fuzzy-uncertainty.clp` — Fuzzy Logic framework
-
----
-
 ## Verification
 
 **Phase 2A:**
@@ -142,7 +128,7 @@
 **Included:**
 - Complete GPU modeling (VRAM, APIs, DirectX versions, graphics intensity)
 - 15+ new software expanding all categories
-- Two probabilistic frameworks (CF + D-S) independently implemented
+- Two probabilistic frameworks (CF + D-S)
 - One possibilistic framework (Fuzzy Logic)
 - User-selectable reasoning method
 - Updated GPU-aware prompts
@@ -151,12 +137,6 @@
 - Hardware auto-detection
 - Multi-objective optimization (cost vs. performance)
 - Market price data
-- ML-based uncertainty refinement
-
-**Assumptions:**
-- CF: positive values use formula `CF_combined = CF1 + CF2 − (CF1 × CF2)`
-- D-S: mass assignments normalized; Dempster's rule for combination
-- Fuzzy: triangular/trapezoidal membership functions
 
 ---
 
@@ -167,7 +147,3 @@
 2. **Performance Scaling** — More rules = longer runtime. Lazy-load uncertainty calculations when requested? **YES** — use rule salience to prioritize.
 
 3. **User Communication Unified Output** — CF/D-S/Fuzzy produce different formats. Create unified "confidence summary" layer? **YES** — post-process all three into single 0–100 suitability + confidence level.
-
----
-
-**Ready to proceed with implementation?** I can help execute any phase once you approve this plan.
