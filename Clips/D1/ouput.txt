@@ -1,0 +1,47 @@
+Available Operating Systems:
+- linux
+- windows-10
+- windows-11
+Please enter the name of the operating system you want to use: windows-10
+
+Available Software Types:
+- development
+- game
+- application
+- graphics
+Enter the software types that you wish to use (separated by commas): development,game
+
+Available Software in game category:
+- minecraft
+- fortnite
+- valorant
+- cyberpunk-2077
+- elden-ring
+Enter the software names that you wish to use (separated by commas): minecraft,valorant
+
+Available Software in development category:
+- visual-studio
+- intellij-idea
+- docker-desktop
+- kubernetes
+- nodejs
+- python
+- pycharm
+- clion
+- vscode
+Enter the software names that you wish to use (separated by commas): vscode,nodejs,python
+
+===== Total Requirements =====
+
+ -- RAM Requirements --
+Total Minimum RAM Required: 2 GB (nearest available size 2 GB)
+Total Recommended RAM Required: 8 GB (nearest available size 8 GB)
+
+ -- Disk Space Requirements --
+Total Minimum Disk Space Required: 20 GB (nearest available size 64 GB)
+Total Recommended Disk Space Required: 64 GB (nearest available size 64 GB)
+
+ -- GPU Requirements --
+Total Minimum VRAM Required: 1 GB
+Total Recommended VRAM Required: 4 GB
+Minimum Supported GPU APIs: (directx-11 directx-9)
