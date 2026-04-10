@@ -10,6 +10,11 @@
     (slot min-disk-gb)
     (slot rec-disk-gb))
 
+(deftemplate os-gpu-requirements
+    (slot min-vram-gb)
+    (slot rec-vram-gb)
+    (multislot gpu-api-versions))
+
 ; When an OS is selected, assert its RAM and disk requirements as separate facts
 (defrule os-requirements
     (declare (salience 3))
@@ -19,7 +24,10 @@
         (min-ram-gb ?os-min-ram)
         (rec-ram-gb ?os-rec-ram)
         (min-disk-gb ?os-min-disk)
-        (rec-disk-gb ?os-rec-disk))
+        (rec-disk-gb ?os-rec-disk)
+        (min-vram-gb ?os-min-vram)
+        (rec-vram-gb ?os-rec-vram)
+        (gpu-api-versions $?os-gpu-apis))
     =>
     (assert (os-ram-requirements
         (min-ram-gb ?os-min-ram)
@@ -27,6 +35,10 @@
     (assert (os-disk-requirements
         (min-disk-gb ?os-min-disk)
         (rec-disk-gb ?os-rec-disk)))
+    (assert (os-gpu-requirements
+        (min-vram-gb ?os-min-vram)
+        (rec-vram-gb ?os-rec-vram)
+        (gpu-api-versions $?os-gpu-apis)))
     (retract ?os-fact)
 )
 
@@ -97,16 +109,23 @@
 (deftemplate software-disk-requirements-cumulative
     (slot total-storage-gb))
 
+; GPU requirement template and cumulative fact
+(deftemplate software-gpu-requirements-cumulative
+    (slot min-vram-gb))
+
 ; Initialize cumulative requirements on startup
 (defrule initialize-cumulative-requirements
     (not (software-ram-requirements-min))
     (not (software-disk-requirements-cumulative))
+    (not (software-gpu-requirements-cumulative))
     =>
     (assert (software-ram-requirements-min
         (min-ram-gb 0)
         (rec-ram-gb 0)))
     (assert (software-disk-requirements-cumulative
         (total-storage-gb 0)))
+    (assert (software-gpu-requirements-cumulative
+        (min-vram-gb 0)))
 )
 
 ; When a software is selected, update the cumulative RAM and disk requirements
@@ -122,6 +141,8 @@
     ?current-ram <- (software-ram-requirements-min
         (min-ram-gb ?current-min-ram)
         (rec-ram-gb ?current-rec-ram))
+    ?current-gpu <- (software-gpu-requirements-cumulative
+        (min-vram-gb ?current-min-vram))
     =>
     ; Update cumulative storage requirement
     (retract ?current-storage)
@@ -133,6 +154,11 @@
     (assert (software-ram-requirements-min
         (min-ram-gb (max ?current-min-ram ?min-ram))
         (rec-ram-gb (max ?current-rec-ram ?rec-ram))))
+
+    ; Update cumulative GPU requirement by taking the max of selected software VRAM needs
+    (retract ?current-gpu)
+    (assert (software-gpu-requirements-cumulative
+        (min-vram-gb (max ?current-min-vram ?min-vram))))
 
     ; Retract the software fact and using-software fact since it's been processed.
     (retract ?using-software)
@@ -168,13 +194,19 @@
     (slot min-disk-gb)
     (slot rec-disk-gb))
 
+(deftemplate total-gpu-requirements
+    (slot min-vram-gb)
+    (slot rec-vram-gb)
+    (multislot gpu-api-versions))
 
 (defrule calculate-total-requirements
     ?done <- (done)
     (os-ram-requirements (min-ram-gb ?os-min-ram) (rec-ram-gb ?os-rec-ram))
     (os-disk-requirements (min-disk-gb ?os-min-disk) (rec-disk-gb ?os-rec-disk))
+    (os-gpu-requirements (min-vram-gb ?os-min-vram) (rec-vram-gb ?os-rec-vram) (gpu-api-versions $?os-gpu-apis))
     (software-ram-requirements-min (min-ram-gb ?sw-min-ram) (rec-ram-gb ?sw-rec-ram))
     (software-disk-requirements-cumulative (total-storage-gb ?sw-storage))
+    (software-gpu-requirements-cumulative (min-vram-gb ?sw-min-vram))
     =>
     (retract ?done)
     (assert (total-requirements
@@ -182,4 +214,8 @@
         (rec-ram-gb (+ ?os-rec-ram ?sw-rec-ram))
         (min-disk-gb (+ ?os-min-disk ?sw-storage))
         (rec-disk-gb (+ ?os-rec-disk ?sw-storage))))
+    (assert (total-gpu-requirements
+        (min-vram-gb (+ ?os-min-vram ?sw-min-vram))
+        (rec-vram-gb (+ ?os-rec-vram ?sw-min-vram))
+        (gpu-api-versions $?os-gpu-apis)))
 )

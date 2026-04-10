@@ -79,11 +79,23 @@
         (rec-ram-gb ?rec-ram)
         (min-disk-gb ?min-disk)
         (rec-disk-gb ?rec-disk))
+    ?total-gpu <- (total-gpu-requirements
+        (min-vram-gb ?min-vram)
+        (rec-vram-gb ?rec-vram)
+        (gpu-api-versions $?gpu-apis))
     =>
-    (printout t crlf "Total Requirements:" crlf)
+    (printout t crlf "===== Total Requirements =====" crlf)
+
+    (printout t crlf " -- RAM Requirements --" crlf)
     (printout t "Total Minimum RAM Required: " ?min-ram " GB (nearest available size " (ram-rounded ?min-ram) " GB)" crlf)
     (printout t "Total Recommended RAM Required: " ?rec-ram " GB (nearest available size " (ram-rounded ?rec-ram) " GB)" crlf)
+    
+    (printout t crlf " -- Disk Space Requirements --" crlf)
     (printout t "Total Minimum Disk Space Required: " ?min-disk " GB (nearest available size " (disk-rounded ?min-disk) " GB)" crlf)
     (printout t "Total Recommended Disk Space Required: " ?rec-disk " GB (nearest available size " (disk-rounded ?rec-disk) " GB)" crlf)
-    (retract ?total)
+    
+    (printout t crlf " -- GPU Requirements --" crlf)
+    (printout t "Total Minimum VRAM Required: " ?min-vram " GB" crlf)
+    (printout t "Total Recommended VRAM Required: " ?rec-vram " GB" crlf)
+    (printout t "Minimum Supported GPU APIs: " $?gpu-apis crlf)
 )
