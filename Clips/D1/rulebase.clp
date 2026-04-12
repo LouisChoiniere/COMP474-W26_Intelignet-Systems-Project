@@ -135,7 +135,8 @@
         (name ?software-name)
         (min-ram-gb ?min-ram)
         (rec-ram-gb ?rec-ram)
-        (storage-gb ?storage-gb))
+        (storage-gb ?storage-gb)
+        (min-vram-gb ?min-vram))
     ?current-storage <- (software-disk-requirements-cumulative
         (total-storage-gb ?current-total))
     ?current-ram <- (software-ram-requirements-min

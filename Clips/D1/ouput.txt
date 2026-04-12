@@ -34,14 +34,14 @@ Enter the software names that you wish to use (separated by commas): vscode,node
 ===== Total Requirements =====
 
  -- RAM Requirements --
-Total Minimum RAM Required: 2 GB (nearest available size 2 GB)
-Total Recommended RAM Required: 8 GB (nearest available size 8 GB)
+Total Minimum RAM Required: 6 GB (nearest available size 8 GB)
+Total Recommended RAM Required: 12 GB (nearest available size 16 GB)
 
  -- Disk Space Requirements --
-Total Minimum Disk Space Required: 20 GB (nearest available size 64 GB)
-Total Recommended Disk Space Required: 64 GB (nearest available size 64 GB)
+Total Minimum Disk Space Required: 74.6 GB (nearest available size 128 GB)
+Total Recommended Disk Space Required: 118.6 GB (nearest available size 128 GB)
 
  -- GPU Requirements --
-Total Minimum VRAM Required: 1 GB
-Total Recommended VRAM Required: 4 GB
+Total Minimum VRAM Required: 3 GB
+Total Recommended VRAM Required: 6 GB
 Minimum Supported GPU APIs: (directx-11 directx-9)
