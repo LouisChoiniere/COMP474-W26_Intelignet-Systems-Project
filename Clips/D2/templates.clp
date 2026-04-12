@@ -47,8 +47,10 @@
 (deftemplate user-computer
     (slot ram-size (type FUZZY-VALUE ram-size))
     (slot cpu-performance (type FUZZY-VALUE cpu-performance))
+    (slot storage-gb)
     (slot gpu-memory (type FUZZY-VALUE gpu-memory))
     (slot gpu-performance (type FUZZY-VALUE gpu-performance))
+    (multislot directx-versions)
 )
 
 (deftemplate software-requirements
@@ -64,4 +66,8 @@
     (slot directx-requirement ; directx-11, directx-12, or none
         (type SYMBOL)
         (allowed-values directx-11 directx-12 none))
+)
+
+(deftemplate using-software
+    (slot name)
 )
