@@ -41,7 +41,7 @@
 ; and if the computer's RAM is below the minimum required, it's very likely that the software will not run at all.
 (defrule no-run-due-to-ram
     (declare (CF 0.90))
-    (using-software ?sname)
+    (using-software (name ?sname))
     (not (program-run-how-well (name ?sname)))
     
     ?software <- (software-requirements
@@ -51,11 +51,35 @@
     ?computer <- (user-computer
                     (ram-size ?ram-size))
     
-    (test (< (maximum-defuzzify ?ram-size) (maximum-defuzzify ?min-ram)))
+    (test (< ?ram-size ?min-ram))
 =>
     (assert (program-run-how-well
         (name ?sname)
         (will-run no)
         (how-well poor)))
     (printout t ?sname " cannot run due to insufficient RAM." crlf)
+)
+
+
+; This rule checks if the software cannot run due to insufficient storage.
+; It has a high certainty factor because storage is also a critical requirement.
+(defrule no-run-due-to-storage
+    (declare (CF 0.85))
+    (using-software (name ?sname))
+    (not (program-run-how-well (name ?sname)))
+    
+    ?software <- (software-requirements
+                    (name ?sname)
+                    (storage-gb ?storage))
+    
+    ?computer <- (user-computer
+                    (storage-gb ?computer-storage))
+    
+    (test (< ?computer-storage ?storage))
+=>
+    (assert (program-run-how-well
+        (name ?sname)
+        (will-run no)
+        (how-well poor)))
+    (printout t ?sname " cannot run due to insufficient storage." crlf)
 )

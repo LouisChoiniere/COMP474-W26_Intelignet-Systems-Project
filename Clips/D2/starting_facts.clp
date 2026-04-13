@@ -10,10 +10,10 @@
 
 (deffacts initial-facts
     (user-computer 
-        (ram-size small)
+        (ram-size 8)
         (cpu-performance medium)
         (storage-gb 256)
-        (gpu-memory small)
+        (gpu-memory 2)
         (gpu-performance small)
         (directx-versions directx-11 directx-12))
 )

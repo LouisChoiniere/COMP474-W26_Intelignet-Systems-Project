@@ -45,20 +45,20 @@
 
 
 (deftemplate user-computer
-    (slot ram-size (type FUZZY-VALUE ram-size))
+    (slot ram-size (type NUMBER))
     (slot cpu-performance (type FUZZY-VALUE cpu-performance))
     (slot storage-gb)
-    (slot gpu-memory (type FUZZY-VALUE gpu-memory))
+    (slot gpu-memory (type NUMBER))
     (slot gpu-performance (type FUZZY-VALUE gpu-performance))
     (multislot directx-versions)
 )
 
 (deftemplate software-requirements
     (slot name)
-    (slot min-ram-gb (type FUZZY-VALUE ram-size))
-    (slot rec-ram-gb (type FUZZY-VALUE ram-size))
+    (slot min-ram-gb (type NUMBER))
+    (slot rec-ram-gb (type NUMBER))
     (slot storage-gb)
-    (slot min-vram-gb (type FUZZY-VALUE gpu-memory))
+    (slot min-vram-gb (type NUMBER))
     (slot gpu-intensive 
         (type SYMBOL)
         (allowed-values yes no))
