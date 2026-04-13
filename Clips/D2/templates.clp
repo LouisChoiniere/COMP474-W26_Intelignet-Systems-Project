@@ -71,3 +71,9 @@
 (deftemplate using-software
     (slot name)
 )
+
+(deftemplate program-run-how-well
+    (slot name)
+    (slot will-run (type SYMBOL) (allowed-values yes no maybe))
+    (slot how-well (type SYMBOL) (allowed-values poor fair good excellent unknown))
+)

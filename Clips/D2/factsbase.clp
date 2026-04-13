@@ -89,6 +89,15 @@
         (gpu-intensive no) 
         (gpu-performance none)
         (directx-requirement none))
+    (software-requirements
+        (name vscode)
+        (min-ram-gb (2 1))
+        (rec-ram-gb (4 1))
+        (storage-gb 0.5)
+        (min-vram-gb (0 1))
+        (gpu-intensive no)
+        (gpu-performance none)
+        (directx-requirement none))
     (software-requirements 
         (name pycharm) 
         (min-ram-gb (4 1)) 
