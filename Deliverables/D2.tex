@@ -1,0 +1,301 @@
+% ---------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+% ---------------------------------------------------------------------------------------
+
+\documentclass{article}
+
+\usepackage[hidelinks]{hyperref}
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+% ---------------------------------------------------------------------------------------
+%	DOCUMENT INFORMATION
+% ---------------------------------------------------------------------------------------
+
+\title{COMP 474: Project Deliverable 2}
+\author{Louis Choinière -- \texttt{40218808}}
+\date{Concordia University -- \today}
+
+% ---------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+\noindent\textbf{Source Code Repository}\\
+The complete source code for this project is available on GitHub:
+\url{https://github.com/LouisChoiniere/COMP474-W26_Intelignet-Systems-Project}
+
+
+% ---------------------------------------------------------------------------------------
+
+\section*{Project Overview}
+
+The expert system developed in this project is designed to evaluate the compatibility of a user's computer hardware with the requirements of various software applications, particularly games and development tools. The system collects hardware specifications from the user, including CPU cores, RAM size, storage capacity, GPU memory, and supported DirectX versions. It then compares these specifications against a database of software requirements to determine whether the software can run on the user's machine and to what extent it will perform.
+
+\section*{TODO 1}
+
+Based on feedback and self-assessment, the following improvements are required and implemented for the next deliverable are the following:
+
+\begin{enumerate}
+    \item \textbf{Expand GPU Requirements}
+          \begin{itemize}
+              \item Enhance \texttt{os-facts} template: add \texttt{min-vram-gb}, \texttt{rec-vram-gb}, and \texttt{gpu-api-versions} fields.
+              \item Update \texttt{software-facts} template: add \texttt{min-vram-gb} \& \texttt{rec-vram-gb} requirement and \texttt{gpu-intensive} boolean flag.
+              \item Implement GPU validation.
+          \end{itemize}
+
+    \item \textbf{Grow Software Database}
+          \begin{itemize}
+              \item Add new software entries.
+              \item Include graphics-intensive entries with VRAM specifications.
+              \item Ensure all entries contain complete OS compatibility and resource requirement specifications.
+          \end{itemize}
+
+    \item \textbf{Performance Probability Assessment}
+          \begin{itemize}
+              \item Implement performance scoring system based on hardware vs. software requirements.
+              \item Calculate confidence score that the program will perform optimally given the hardware configuration.
+              \item Identify required hardware upgrades with priority recommendations.
+              \item Generate upgrade suggestions (CPU, RAM, VRAM, GPU).
+          \end{itemize}
+\end{enumerate}
+
+% ---------------------------------------------------------------------------------------
+
+\section*{TODO 2}
+
+% Modify K (specifically, F by at least 5 useful facts and R by at least 10 useful rules) by
+% knowledge in D that is probabilistically uncertain. For modeling probabilistic uncertainty,
+% use the Certainty Factors Theory or the Dempster-Shafer Theory.
+
+% This modification may lead to revision and/or extension of the collection facts and the
+% collection rules from D1 TODO 4.
+
+The knowledge base has been enhanced to support more hardware-software compatibility with the addition of GPU information and requirements. The \texttt{software-facts} template was extended with four new GPU-related fields: \texttt{min-vram-gb}, \texttt{rec-vram-gb}, \texttt{gpu-intensive}, and \texttt{directx-requirement}, enabling specifications of graphics memory requirements and supported DirectX versions. Additionally, \texttt{cpu-cores} was integrated into both software requirements and hardware specifications to capture processor parallelism constraints. The software database was expanded with new entries and updates to existing ones to reflect the enhanced templates.
+
+To assess the feasibility of running software on a given system, a set of rules was implemented to calculate a certainty factor (CF) score based on a comparison between user hardware facts and software requirements. These rules evaluate processor capabilities, memory availability, VRAM sufficiency, and API support, generating a confidence score that indicates whether the software will perform optimally on the system. For example:
+
+\begin{file}[No run due to insufficient RAM]
+    \begin{lstlisting}
+(defrule no-run-due-to-ram
+    (declare (salience 10) (CF 0.1))
+    (using-software (name ?sname))
+    
+    ?software <- (software-requirements
+                    (name ?sname)
+                    (min-ram-gb ?min-ram))
+    
+    ?computer <- (user-computer
+                    (ram-size ?ram-size))
+    
+    (test (< ?ram-size ?min-ram))
+=>
+    (assert (program-run
+        (name ?sname)))
+    (printout t ?sname " cannot run due to insufficient RAM." crlf)
+)
+\end{lstlisting}
+\end{file}
+
+In this example, if the user's RAM size is below the minimum required by the software, a certainty factor of 0.1 is assigned to the fact about the program's ability to run, indicating a low confidence level. Similar rules are implemented for CPU cores, VRAM, and DirectX support, allowing for an assessment of software compatibility with the user's hardware. Another example for a good performance scenario:
+
+\begin{file}[Likely to run excellently]
+    \begin{lstlisting}
+; This rule checks if the software is likely to run excellently,
+; which means it exceeds the recommended requirements.
+(defrule excellent-run
+    (declare (salience 50) (CF 0.95))
+    (using-software (name ?sname))
+    (not (program-run (name ?sname)))
+    
+    ?software <- (software-requirements
+                    (name ?sname)
+                    (rec-ram-gb ?rec-ram)
+                    (storage-gb ?storage)
+                    (rec-vram-gb ?rec-vram)
+                    (gpu-intensive ?gpu-intensive)
+                    (directx-requirement ?dx))
+    
+    ?computer <- (user-computer
+                    (ram-size ?ram-size)
+                    (storage-gb ?computer-storage)
+                    (gpu-memory ?gpu-memory)
+                    (directx-versions $?directx-versions))
+    
+    (test (and 
+        (> ?ram-size ?rec-ram) ; RAM exceeds recommended requirement
+        (> ?computer-storage (* 1.5 ?storage)) ; Storage exceeds requirement by a good margin
+        (> ?gpu-memory ?rec-vram) ; GPU memory exceeds recommended requirement
+        (or (eq ?dx none) (member$ ?dx ?directx-versions)) ; DirectX requirement is met
+    ))
+=>
+    (assert (program-run
+        (name ?sname)))
+    
+    (printout t ?sname " is likely to run excellently on the user's computer." crlf)
+)
+\end{lstlisting}
+\end{file}
+
+These rules allow the system to provide a nuanced assessment of software compatibility, taking into account various hardware factors and their impact on performance providing a certainty factor that reflects the confidence level of the assessment.
+
+
+
+When performance cannot be assured with a high confidence factor, diagnostic facts are generated to identify specific hardware limitations, enabling the subsequent generation of prioritized upgrade recommendations for CPU, RAM, VRAM, and GPU components.
+
+% ---------------------------------------------------------------------------------------
+
+\section*{TODO 3}
+
+% Modify K (specifically, F by at least 5 useful facts and R by at least 10 useful rules) by
+% knowledge in D that is possibilistically uncertain. For modeling possibilistic uncertainty,
+% use the Fuzzy Logic Theory.
+
+The knowledge base was extended with a fuzzy analysis layer to model possibilistic uncertainty in software performance. The fuzzy section of the rulebase introduces templates for computer analysis, hardware gaps, risk tracking, and final upgrade recommendations. In particular, the \texttt{performance-gap-fuzzy} template defines three linguistic outcomes, \texttt{no-upgrade-needed}, \texttt{consider-upgrade}, and \texttt{upgrade-needed}, allowing the system to express a graded assessment instead of a simple binary answer.
+
+\begin{file}[Fuzzy performance gap template]
+    \begin{lstlisting}
+(deftemplate performance-gap-fuzzy
+    0 100 percent
+    (
+        (no-upgrade-needed (z 0 50))
+        (consider-upgrade (s 25 75))
+        (upgrade-needed (s 50 100))
+    )
+)
+
+(deftemplate need-for-upgrade
+    (slot performance-gap (type FUZZY-VALUE performance-gap-fuzzy))
+)
+\end{lstlisting}
+\end{file}
+
+The fuzzy reasoning process is driven by a staged rule flow. First, the system starts a computer analysis pass once both the selected software and the user hardware are available. It then converts any previously detected missing requirements into explicit gap facts for RAM, storage, GPU memory, and DirectX support. After that, the system marks high-demand software as a risk factor when the program is GPU-intensive, which raises the overall severity of the assessment.
+
+\begin{file}[Assessing low effectiveness with fuzzy logic]
+    \begin{lstlisting}
+(defrule assess-low-effectiveness
+    (declare (salience 5))
+    (computer-analysis (stage started))
+    (computer-gap (name ?gap))
+    (computer-risk (level high))
+    (not (computer-assessment (performance-gap ?existing-assessment)))
+=>
+    (assert (computer-assessment (performance-gap upgrade-needed)))
+    (printout t "Assessment fact asserted: upgrade-needed." crlf)
+)
+\end{lstlisting}
+\end{file}
+
+Once the evidence has been collected, the rulebase generates a fuzzy performance judgment. If no gaps or high-risk signals are present, the system asserts \texttt{no-upgrade-needed}. If gaps exist but the situation is not critical, it asserts \texttt{consider-upgrade}. If a high-demand workload is combined with compatibility gaps, it asserts \texttt{upgrade-needed}. These intermediate fuzzy conclusions are then materialized into a single \texttt{need-for-upgrade} fact, ensuring that only one final recommendation is reported.
+
+The final stage prints a concise summary of the assessment. Depending on the fuzzy result, the system reports whether the machine is sufficient, has visible limitations, or is not a good fit for the requested software. This structure allows the knowledge base to express uncertainty more naturally by reflecting partial adequacy in hardware-software compatibility rather than forcing an all-or-nothing decision.
+
+\begin{file}[Assessing low effectiveness with fuzzy logic]
+    \begin{lstlisting}
+(defrule print-computer-assessment-summary-high
+    (declare (salience -12))
+    (need-for-upgrade (performance-gap no-upgrade-needed))
+    (not (need-for-upgrade (performance-gap consider-upgrade)))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+    (not (analysis-summary (status printed)))
+=>
+    (assert (analysis-summary (status printed)))
+    (printout t crlf "COMPUTER EFFECTIVENESS SUMMARY" crlf)
+    (printout t "  Fuzzy result: no-upgrade-needed" crlf)
+    (printout t "  Interpretation: the machine is sufficient for the requested software." crlf)
+)
+\end{lstlisting}
+\end{file}
+
+% ---------------------------------------------------------------------------------------
+
+\section*{TODO 4}
+
+% (a) Select at least 4 quality attributes relevant to your rule-based expert system. Justify
+% your choice.
+% (b) Apply the guidelines for quality of rule-based expert systems to the overall collection
+% of facts in F (meaning, facts from D1 TODO 4, facts from D2 TODO 2, and facts
+% from D2 TODO 3) and to the overall collection of rules in R (meaning, rules from D1
+% TODO 4, rules from D2 TODO 2, and rules from D2 TODO 3). Mention where and
+% how you applied the guidelines. (This must be independently verifiable.)
+% (c) Explain the impact of the guidelines on the quality of knowledge representation
+% and/or inference, where the “impact” could be positive, negative, or neither positive,
+% nor negative.
+
+\noindent\textbf{(a) Selected Quality Attributes and Justification}
+
+\noindent The following quality attributes were selected as the most relevant for this expert system:
+
+\begin{enumerate}
+    \item \textbf{Consistency}: rules from D1, D2 TODO 2, and D2 TODO 3 must not produce contradictory final recommendations for the same input context.
+    \item \textbf{Modifiability}: software requirements evolve frequently; adding a new game/tool or changing minimum/recommended requirements should require local changes only.
+    \item \textbf{Understandability}: stakeholders should understand why a result was produced (for example, DirectX gap, RAM gap, or high-demand GPU risk).
+    \item \textbf{Testability}: the system should be easy to validate by injecting specific facts and observing deterministic outputs.
+\end{enumerate}
+
+\noindent\textbf{(b) Application of Quality Guidelines to Facts (F) and Rules (R)}
+
+\noindent The guidelines were applied as follows (independently verifiable in \texttt{templates.clp} and \texttt{rulebase.clp}):
+
+\begin{itemize}
+    \item \textbf{Prefer unordered facts over ordered facts}: The knowledge representation always uses \texttt{deftemplate} structures such as \texttt{user-computer}, \texttt{software-requirements}, etc. All of the facts are unordered, with named slots, improving readability and reducing errors from positional mismatches.
+    \item \textbf{Reduce potential ambiguity with explicit constraints}: templates define slot types and \texttt{allowed-values}, e.g., \texttt{gpu-intensive} in \{yes, no\}, \texttt{directx-requirement} in \{directx-11, directx-12, none\}, and \texttt{missing-requirement} in \{ram, storage, gpu-memory, directx\}. This reduces the risk of malformed facts and improves consistency.
+    \item \textbf{Reuse patterns}: Multiple rules intentionally reuse the same LHS anchors, e.g., \texttt{(computer-analysis (stage started))} and \texttt{(using-software (name ?sname))}, to support node sharing and reduce redundant matching.
+    \item \textbf{Use conditional elements judiciously}: \texttt{not} conditions are used to prevent duplicate assertions, e.g., \texttt{(not (computer-gap (name ram)))} and \texttt{(not (analysis-summary (status printed)))}.
+    \item \textbf{Include explanation outputs}: Explanatory \texttt{printout} traces are produced in key rules (gap detection and final summary), improving traceability for users.
+\end{itemize}
+
+\noindent\textbf{(c) Impact of the Guidelines on Knowledge and Inference}
+
+The observed impacts are mixed but overall positive:
+
+\begin{itemize}
+    \item \textbf{Positive}: Typed templates and constrained slot values improve correctness and consistency by reducing malformed or ambiguous facts.
+    \item \textbf{Positive}: Reused patterns and staged salience improve execution predictability and make behavior easier to validate during testing.
+    \item \textbf{Positive}: Explanation-oriented printouts improve understandability and humility by exposing both outcomes and limits.
+    \item \textbf{Neutral trade-off}: Salience improves deterministic control flow, but strong dependence on many priority levels can reduce modifiability as new rules are inserted.
+    \item \textbf{Remaining limitation}: Module separation (\texttt{defmodule}) has not yet been introduced; adding modules for compatibility checking, uncertainty reasoning, and reporting would improve modularity and testability further.
+\end{itemize}
+
+
+% ---------------------------------------------------------------------------------------
+
+
+\begin{thebibliography}{99}
+
+    \bibitem{photoshop-req}
+    Adobe, ``Adobe Photoshop on desktop technical requirements,'' \textit{Adobe Help}, \url{https://helpx.adobe.com/photoshop/system-requirements/2024.html}
+
+    \bibitem{blender-req}
+    Blender Foundation, ``System Requirements for Blender,'' \url{https://www.blender.org/download/requirements/}
+
+    \bibitem{unreal-req}
+    Epic Games, ``Hardware and Software Specifications,'' \url{https://dev.epicgames.com/documentation/en-us/unreal-engine/hardware-and-software-specifications-for-unreal-engine}
+
+    \bibitem{fortnite-req}
+    Epic Games, ``What are the system requirements for Fortnite on PC?,'' \textit{Epic Games Help}, \url{https://www.epicgames.com/help/en-US/fortnite-battle-royale-c-202300000001636/technical-support-c-202300000001719/what-are-the-system-requirements-for-fortnite-on-pc-a202300000012731}
+
+    \bibitem{intellij-req}
+    JetBrains, ``Install IntelliJ IDEA,'' \url{https://www.jetbrains.com/help/idea/installation-guide.html}
+
+    \bibitem{minecraft-req}
+    Mojang Studios, ``Minecraft: Java Edition System Requirements,'' \url{https://www.minecraft.net/en-us/store/minecraft-deluxe-collection-pc}
+
+    \bibitem{visualstudio-req}
+    Microsoft, ``Visual Studio 2022 Product Family System Requirements,'' \textit{Microsoft Learn}, \url{https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements}
+
+    \bibitem{valorant-req}
+    Riot Games, ``Minimum \& Recommended PC Specs,'' \textit{Valorant Support}, \url{https://support-valorant.riotgames.com/hc/en-us/articles/360044136134-Minimum-Recommended-PC-Specs}
+
+    \bibitem{steam}
+    Valve, ``Steam,'' \url{https://store.steampowered.com/}
+
+    \bibitem{zoom-req}
+    Zoom, ``Zoom system requirements: Windows, macOS, Linux,'' \textit{Zoom Support}, \url{https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0060748}
+
+\end{thebibliography}
+
+% ---------------------------------------------------------------------------------------
+
+\end{document}

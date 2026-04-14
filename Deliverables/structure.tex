@@ -24,8 +24,8 @@
 
 
 % Paragraph formatting
-\setlength{\parindent}{1.5em}
-\setlength{\parskip}{0.6em}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{1em}
 
 \usepackage{setspace} % Line spacing and paragraph formatting
 \setstretch{1.15} % Set line spacing to 1.15
@@ -39,7 +39,7 @@
 
 \usepackage{listings} % File listings, with syntax highlighting
 \lstset{
-    basicstyle=\small\ttfamily, % Code font and size
+    basicstyle=\footnotesize\ttfamily, % f font and size
     breaklines=true, % Enable line wrapping in listings
     % breakatwhitespace=true, % Prefer breaks at whitespace
 }
@@ -132,7 +132,7 @@
 % \end{file}
 
 \mdfdefinestyle{file}{
-	innertopmargin=1.6em,
+	innertopmargin=2.5em,
 	topline=true, bottomline=true,
 	leftline=true, rightline=true,
 	leftmargin=0.5cm,
@@ -142,12 +142,12 @@
 	singleextra ={
 		\draw[fill=black!10!white](P)++(0,-1.2em)rectangle(P-|O);
 		\node[anchor=north west]
-		at(P-|O){\ttfamily\mdfilename};
+		at(P-|O){\ttfamily\small\mdfilename};
 	},
 	firstextra={
 		\draw[fill=black!10!white](P)++(0,-1.2em)rectangle(P-|O);
 		\node[anchor=north west]
-		at(P-|O){\ttfamily\mdfilename};
+		at(P-|O){\ttfamily\small\mdfilename};
 	},
 	middleextra={},
 	secondextra={},
@@ -158,7 +158,6 @@
 	\medskip
 	\newcommand{\mdfilename}{#1}
 	\begin{mdframed}[style=file]
-	\footnotesize
 	\setstretch{0.9}
 }{
 	\normalsize

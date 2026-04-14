@@ -98,6 +98,25 @@
     (printout t ?sname " cannot run due to DirectX requirement not met." crlf)
 )
 
+(defrule bad-run-cpu
+    (declare (salience 10) (CF 0.5))
+    (using-software (name ?sname))
+    ; (not (program-run (name ?sname)))
+    
+    ?software <- (software-requirements
+                    (name ?sname)
+                    (cores-required ?cores-required))
+    
+    ?computer <- (user-computer
+                    (number-of-cores ?number-of-cores))
+    
+    (test (< ?number-of-cores ?cores-required))
+=>
+    (assert (program-run
+        (name ?sname)))
+    (printout t ?sname " may run poorly due to insufficient CPU cores." crlf)
+)
+
 ; This rule checks if the software is likely to run well, which means it meets the minimum requirements.
 (defrule good-run
     (declare (salience 45) (CF 0.70))
@@ -138,10 +157,9 @@
     
     ?software <- (software-requirements
                     (name ?sname)
-                    (min-ram-gb ?min-ram)
                     (rec-ram-gb ?rec-ram)
                     (storage-gb ?storage)
-                    (min-vram-gb ?min-vram)
+                    (rec-vram-gb ?rec-vram)
                     (gpu-intensive ?gpu-intensive)
                     (directx-requirement ?dx))
     
@@ -154,7 +172,7 @@
     (test (and 
         (> ?ram-size ?rec-ram) ; RAM exceeds recommended requirement
         (> ?computer-storage (* 1.5 ?storage)) ; Storage exceeds requirement by a good margin
-        (> ?gpu-memory (* 1.5 ?min-vram)) ; GPU memory exceeds requirement by a good margin
+        (> ?gpu-memory ?rec-vram) ; GPU memory exceeds recommended requirement
         (or (eq ?dx none) (member$ ?dx ?directx-versions)) ; DirectX requirement is met
     ))
 =>
