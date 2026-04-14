@@ -7,14 +7,3 @@
     (using-software (name spotify))
     (using-software (name cyberpunk-2077))
 )
-
-(deffacts initial-facts
-    (user-computer 
-        (ram-size 8)
-        (cpu-performance medium)
-        (storage-gb 256)
-        (gpu-memory 2)
-        (gpu-performance small)
-        (directx-versions directx-11 directx-12))
-)
-

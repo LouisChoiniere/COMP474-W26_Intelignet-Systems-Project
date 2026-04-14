@@ -110,14 +110,12 @@
                     (storage-gb ?storage)
                     (min-vram-gb ?min-vram)
                     (gpu-intensive ?gpu-intensive)
-                    (gpu-performance ?required-gpu-performance)
                     (directx-requirement ?dx))
     
     ?computer <- (user-computer
                     (ram-size ?ram-size)
                     (storage-gb ?computer-storage)
                     (gpu-memory ?gpu-memory)
-                    (gpu-performance ?gpu-performance)
                     (directx-versions $?directx-versions))
     
     (test (and 
@@ -145,14 +143,12 @@
                     (storage-gb ?storage)
                     (min-vram-gb ?min-vram)
                     (gpu-intensive ?gpu-intensive)
-                    (gpu-performance ?required-gpu-performance)
                     (directx-requirement ?dx))
     
     ?computer <- (user-computer
                     (ram-size ?ram-size)
                     (storage-gb ?computer-storage)
                     (gpu-memory ?gpu-memory)
-                    (gpu-performance ?gpu-performance)
                     (directx-versions $?directx-versions))
     
     (test (and 

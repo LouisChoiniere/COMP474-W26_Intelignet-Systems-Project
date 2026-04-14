@@ -6,6 +6,7 @@
 (load "/home/louis/code/COMP474-W26_Intelignet-Systems-Project/Clips/D2/factsbase.clp")
 (load "/home/louis/code/COMP474-W26_Intelignet-Systems-Project/Clips/D2/starting_facts.clp")
 (load "/home/louis/code/COMP474-W26_Intelignet-Systems-Project/Clips/D2/rulebase.clp")
+(load "/home/louis/code/COMP474-W26_Intelignet-Systems-Project/Clips/D2/functions.clp")
 
 (reset)
 ; (run)
