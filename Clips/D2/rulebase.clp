@@ -234,3 +234,175 @@
     (assert (missing-requirement
         (name directx)))
 )
+
+; ==================== Fuzzy Logic Rules for Software Compatibility ====================
+
+; Step 1: Start a fuzzy analysis pass once the computer and software inputs exist.
+(defrule start-computer-analysis
+    (declare (salience 20))
+    ?computer <- (user-computer)
+    (using-software (name ?sname))
+    (not (computer-analysis (stage started)))
+=>
+    (assert (computer-analysis (stage started)))
+    (printout t "Starting fuzzy computer analysis." crlf)
+)
+
+; Step 2: Convert missing-requirement facts into explicit gap facts.
+(defrule mark-ram-gap
+    (declare (salience 15))
+    (computer-analysis (stage started))
+    (missing-requirement (name ram))
+    (not (computer-gap (name ram)))
+=>
+    (assert (computer-gap (name ram)))
+    (printout t "Gap detected: RAM." crlf)
+)
+
+(defrule mark-storage-gap
+    (declare (salience 15))
+    (computer-analysis (stage started))
+    (missing-requirement (name storage))
+    (not (computer-gap (name storage)))
+=>
+    (assert (computer-gap (name storage)))
+    (printout t "Gap detected: storage." crlf)
+)
+
+(defrule mark-gpu-gap
+    (declare (salience 15))
+    (computer-analysis (stage started))
+    (missing-requirement (name gpu-memory))
+    (not (computer-gap (name gpu-memory)))
+=>
+    (assert (computer-gap (name gpu-memory)))
+    (printout t "Gap detected: GPU memory." crlf)
+)
+
+(defrule mark-directx-gap
+    (declare (salience 15))
+    (computer-analysis (stage started))
+    (missing-requirement (name directx))
+    (not (computer-gap (name directx)))
+=>
+    (assert (computer-gap (name directx)))
+    (printout t "Gap detected: DirectX support." crlf)
+)
+
+; Step 3: Turn the demanding cyberpunk outcome into a high-risk signal.
+(defrule mark-high-demand-risk
+    (declare (salience 12))
+    (computer-analysis (stage started))
+    (software-requirements 
+        (name ?sname)
+        (gpu-intensive yes))
+    (program-run (name ?sname))
+    (not (computer-risk (level high)))
+=>
+    (assert (computer-risk (level high)))
+    (printout t "High-demand software risk detected: " ?sname crlf)
+)
+
+; Step 4: Convert the evidence into a fuzzy assessment fact.
+(defrule assess-high-effectiveness
+    (declare (salience 0))
+    (computer-analysis (stage started))
+    (program-run (name ?program))
+    (not (computer-gap (name ram)))
+    (not (computer-gap (name storage)))
+    (not (computer-gap (name gpu-memory)))
+    (not (computer-gap (name directx)))
+    (not (computer-risk (level high)))
+    (not (computer-assessment (performance-gap ?existing-assessment)))
+=>
+    (assert (computer-assessment (performance-gap no-upgrade-needed)))
+    (printout t "Assessment fact asserted: no-upgrade-needed." crlf)
+)
+
+(defrule assess-medium-effectiveness
+    (declare (salience 0))
+    (computer-analysis (stage started))
+    (computer-gap (name ?gap))
+    (not (computer-risk (level high)))
+    (not (computer-assessment (performance-gap ?existing-assessment)))
+=>
+    (assert (computer-assessment (performance-gap consider-upgrade)))
+    (printout t "Assessment fact asserted: consider-upgrade." crlf)
+)
+
+(defrule assess-low-effectiveness
+    (declare (salience 5))
+    (computer-analysis (stage started))
+    (computer-gap (name ?gap))
+    (computer-risk (level high))
+    (not (computer-assessment (performance-gap ?existing-assessment)))
+=>
+    (assert (computer-assessment (performance-gap upgrade-needed)))
+    (printout t "Assessment fact asserted: upgrade-needed." crlf)
+)
+
+; Step 5: Materialize one final recommendation with priority.
+; Priority: upgrade-needed > consider-upgrade > no-upgrade-needed.
+(defrule recommend-upgrade-needed
+    (declare (salience -5))
+    (computer-assessment (performance-gap upgrade-needed))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+=>
+    (assert (need-for-upgrade (performance-gap upgrade-needed)))
+)
+
+(defrule recommend-consider-upgrade
+    (declare (salience -6))
+    (computer-assessment (performance-gap consider-upgrade))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+    (not (need-for-upgrade (performance-gap consider-upgrade)))
+=>
+    (assert (need-for-upgrade (performance-gap consider-upgrade)))
+)
+
+(defrule recommend-no-upgrade-needed
+    (declare (salience -7))
+    (computer-assessment (performance-gap no-upgrade-needed))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+    (not (need-for-upgrade (performance-gap consider-upgrade)))
+    (not (need-for-upgrade (performance-gap no-upgrade-needed)))
+=>
+    (assert (need-for-upgrade (performance-gap no-upgrade-needed)))
+)
+
+; Step 6: Print exactly one summary line group.
+(defrule print-computer-assessment-summary-low
+    (declare (salience -10))
+    (need-for-upgrade (performance-gap upgrade-needed))
+    (not (analysis-summary (status printed)))
+=>
+    (assert (analysis-summary (status printed)))
+    (printout t crlf "COMPUTER EFFECTIVENESS SUMMARY" crlf)
+    (printout t "  Fuzzy result: upgrade-needed" crlf)
+    (printout t "  Interpretation: the machine is not a good fit for the requested software." crlf)
+)
+
+(defrule print-computer-assessment-summary-medium
+    (declare (salience -11))
+    (need-for-upgrade (performance-gap consider-upgrade))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+    (not (analysis-summary (status printed)))
+=>
+    (assert (analysis-summary (status printed)))
+    (printout t crlf "COMPUTER EFFECTIVENESS SUMMARY" crlf)
+    (printout t "  Fuzzy result: consider-upgrade" crlf)
+    (printout t "  Interpretation: the machine works, but has visible limits." crlf)
+)
+
+(defrule print-computer-assessment-summary-high
+    (declare (salience -12))
+    (need-for-upgrade (performance-gap no-upgrade-needed))
+    (not (need-for-upgrade (performance-gap consider-upgrade)))
+    (not (need-for-upgrade (performance-gap upgrade-needed)))
+    (not (analysis-summary (status printed)))
+=>
+    (assert (analysis-summary (status printed)))
+    (printout t crlf "COMPUTER EFFECTIVENESS SUMMARY" crlf)
+    (printout t "  Fuzzy result: no-upgrade-needed" crlf)
+    (printout t "  Interpretation: the machine is sufficient for the requested software." crlf)
+)

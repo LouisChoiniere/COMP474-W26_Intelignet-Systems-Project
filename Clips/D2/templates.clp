@@ -40,13 +40,22 @@
 )
 
 ; ==================== Fuzzy Logic Templates for Software Compatibility ====================
-(deftemplate computer-effectiveness
-    0 100 percent
-    (
-        (low (z 0 50))
-        (medium (s 25 75))
-        (high (s 50 100))
-    )
+(deftemplate computer-analysis
+    (slot stage
+        (type SYMBOL)
+        (allowed-values started))
+)
+
+(deftemplate computer-gap
+    (slot name
+        (type SYMBOL)
+        (allowed-values ram storage gpu-memory directx))
+)
+
+(deftemplate computer-risk
+    (slot level
+        (type SYMBOL)
+        (allowed-values high))
 )
 
 (deftemplate performance-gap-fuzzy
@@ -57,6 +66,30 @@
         (upgrade-needed (s 50 100))
     )
 )
+
+(deftemplate computer-assessment
+    (slot performance-gap (type FUZZY-VALUE performance-gap-fuzzy))
+)
+
+(deftemplate analysis-summary
+    (slot status
+        (type SYMBOL)
+        (allowed-values printed))
+)
+
+(deftemplate percentage-fuzzy
+    0 100 percent
+    (
+        (low (z 0 50))
+        (medium (s 25 75))
+        (high (s 50 100))
+    )
+)
+
+(deftemplate computer-effectiveness
+    (slot performance-gap (type FUZZY-VALUE percentage-fuzzy))
+)
+
 
 (deftemplate need-for-upgrade
     ; (slot effectiveness (type FUZZY-VALUE computer-effectiveness))
